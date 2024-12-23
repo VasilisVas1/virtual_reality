@@ -2,21 +2,19 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
-
 public class BoatInteraction : MonoBehaviour
 {
     public GameObject player;
     public GameObject boat;
     public GameObject interactionUI;     // "Press E to Talk" message
-    public Transform portPosition; // The port's position
-    public Transform playerLandPosition; // Where the player lands after disembarking
+    public Transform[] portPositions; // Array of possible port positions
+    public Transform[] playerLandPositions; // Array of land positions for disembarking
     public Camera playerCamera;
     public Camera boatCamera;
     public TMP_Text interactionPrompt; // Reference to the UI Text element
-    public TMP_Text secondinteractionPrompt; // Reference to the UI Text element
+    public TMP_Text secondInteractionPrompt; // Reference to the UI Text element
 
     public float portProximityThreshold = 1f; // How close the boat needs to be to the port
-    public GameObject disembarkCollider;
 
     private bool isNearBoat = false;
     private bool isOnBoat = false;
@@ -39,40 +37,42 @@ public class BoatInteraction : MonoBehaviour
     }
 
     void Update()
-{
-    if (isNearBoat)
     {
-        if (isOnBoat)
-        {
-            interactionUI.SetActive(true); 
-            if (Vector3.Distance(boat.transform.position, portPosition.position) <= portProximityThreshold)
-            {
-                secondinteractionPrompt.text = "Press E to Disembark"; 
-            }
-            else
-            {
-                secondinteractionPrompt.text = "";
-            }
-        }
-        else
-        {
-            interactionUI.SetActive(false);
-            interactionPrompt.text = "Press E to ride the boat";
-        }
-
-        if (Input.GetKeyDown(KeyCode.E))
+        if (isNearBoat)
         {
             if (isOnBoat)
             {
-                TryDisembark();
+                interactionUI.SetActive(true);
+                // Check if the boat is near any port position
+                Transform closestPort = GetClosestPort();
+                if (Vector3.Distance(boat.transform.position, closestPort.position) <= portProximityThreshold)
+                {
+                    secondInteractionPrompt.text = "Press E to Disembark"; 
+                }
+                else
+                {
+                    secondInteractionPrompt.text = "";
+                }
             }
             else
             {
-                BoardBoat();
+                interactionUI.SetActive(false);
+                interactionPrompt.text = "Press E to ride the boat";
+            }
+
+            if (Input.GetKeyDown(KeyCode.E))
+            {
+                if (isOnBoat)
+                {
+                    TryDisembark();
+                }
+                else
+                {
+                    BoardBoat();
+                }
             }
         }
     }
-}
 
     private void BoardBoat()
     {
@@ -90,58 +90,90 @@ public class BoatInteraction : MonoBehaviour
         }
     }
 
-    private void TryDisembark()
+   private void TryDisembark()
+{
+    // Find the closest port position
+    Transform closestPort = GetClosestPort();
+
+    // Check if the boat is near the closest port position
+    if (Vector3.Distance(boat.transform.position, closestPort.position) <= portProximityThreshold)
     {
-        // Check if the boat is near the port
-        if (Vector3.Distance(boat.transform.position, portPosition.position) <= portProximityThreshold)
+        // Find the corresponding land position for the closest port
+        Transform correspondingLandPosition = playerLandPositions[System.Array.IndexOf(portPositions, closestPort)];
+
+        isOnBoat = false;
+
+        player.SetActive(true);
+        player.transform.position = correspondingLandPosition.position;
+
+        // Do not reset the boat's position, so it stays where the player disembarked
+        // boat.transform.position = boatStartPosition; // Remove this line
+
+        boat.transform.rotation = boatStartRotation; // You can keep rotation resetting if needed
+
+        // Disable boat controls
+        boat.GetComponent<BoatController>().enabled = false;
+        
+        // Stop the boat's movement immediately
+        /*
+        Rigidbody boatRb = boat.GetComponent<Rigidbody>();
+        boatRb.linearVelocity = Vector3.zero; // Stop linear velocity
+        boatRb.angularVelocity = Vector3.zero; // Stop angular velocity
+        */
+
+        // Switch cameras
+        boatCamera.enabled = false;
+        playerCamera.enabled = true;
+    }
+    else
+    {
+        Debug.Log("You can only disembark when the boat is at the port!");
+    }
+}
+
+
+    private Transform GetClosestPort()
+    {
+        Transform closestPort = null;
+        float closestDistance = Mathf.Infinity;
+
+        foreach (Transform port in portPositions)
         {
-            isOnBoat = false;
-
-            player.SetActive(true);
-            player.transform.position = playerLandPosition.position;
-
-            boat.transform.position = boatStartPosition;
-            boat.transform.rotation = boatStartRotation;
-
-            // Disable boat controls
-            boat.GetComponent<BoatController>().enabled = false;
-
-            // Switch cameras
-            boatCamera.enabled = false;
-            playerCamera.enabled = true;
+            float distance = Vector3.Distance(boat.transform.position, port.position);
+            if (distance < closestDistance)
+            {
+                closestDistance = distance;
+                closestPort = port;
+            }
         }
-        else
-        {
-            Debug.Log("You can only disembark when the boat is at the port!");
-        }
+
+        return closestPort;
     }
 
     private void OnTriggerEnter(Collider other)
-{
-    
-    if (other.gameObject == player)
     {
-        isNearBoat = true;
-
-        if (interactionPrompt != null)
+        if (other.gameObject == player)
         {
-            interactionPrompt.gameObject.SetActive(true);
-            interactionPrompt.text = isOnBoat ? "Press 'E' to disembark" : "Press 'E' to ride the boat";
+            isNearBoat = true;
+
+            if (interactionPrompt != null)
+            {
+                interactionPrompt.gameObject.SetActive(true);
+                interactionPrompt.text = isOnBoat ? "Press 'E' to disembark" : "Press 'E' to ride the boat";
+            }
         }
     }
-}
 
-private void OnTriggerExit(Collider other)
-{
-    if (other.gameObject == player)
+    private void OnTriggerExit(Collider other)
     {
-        isNearBoat = false;
-
-        if (interactionPrompt != null)
+        if (other.gameObject == player)
         {
-            interactionPrompt.gameObject.SetActive(false);
+            isNearBoat = false;
+
+            if (interactionPrompt != null)
+            {
+                interactionPrompt.gameObject.SetActive(false);
+            }
         }
     }
-}
-
 }
