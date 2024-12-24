@@ -16,6 +16,7 @@ TagManager:
   - WaterBoundary
   - DanceZone
   - Fountain
+  - BellZone
   layers:
   - Default
   - TransparentFX

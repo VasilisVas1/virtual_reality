@@ -23,56 +23,72 @@ public class BoatInteraction : MonoBehaviour
     private Quaternion boatStartRotation;
 
     void Start()
+{
+    boatStartPosition = boat.transform.position;
+    boatStartRotation = boat.transform.rotation;
+
+    boatCamera.enabled = false;
+    boat.GetComponent<BoatController>().enabled = false;
+
+    if (interactionPrompt != null)
     {
-        boatStartPosition = boat.transform.position;
-        boatStartRotation = boat.transform.rotation;
-
-        boatCamera.enabled = false;
-        boat.GetComponent<BoatController>().enabled = false;
-
-        if (interactionPrompt != null)
-        {
-            interactionPrompt.gameObject.SetActive(false);
-        }
+        interactionPrompt.text = ""; // Clear any initial text
+        interactionPrompt.gameObject.SetActive(false); // Hide the prompt initially
     }
 
-    void Update()
+    if (secondInteractionPrompt != null)
     {
-        if (isNearBoat)
+        secondInteractionPrompt.text = ""; // Clear any initial text
+        secondInteractionPrompt.gameObject.SetActive(false); // Hide the second prompt initially
+    }
+}
+
+
+    void Update()
+{
+    if (isNearBoat)
+    {
+        interactionUI.SetActive(true);
+
+        if (isOnBoat)
         {
-            if (isOnBoat)
+            Transform closestPort = GetClosestPort();
+            if (Vector3.Distance(boat.transform.position, closestPort.position) <= portProximityThreshold)
             {
-                interactionUI.SetActive(true);
-                // Check if the boat is near any port position
-                Transform closestPort = GetClosestPort();
-                if (Vector3.Distance(boat.transform.position, closestPort.position) <= portProximityThreshold)
-                {
-                    secondInteractionPrompt.text = "Press E to Disembark"; 
-                }
-                else
-                {
-                    secondInteractionPrompt.text = "";
-                }
+                secondInteractionPrompt.gameObject.SetActive(true);
+                secondInteractionPrompt.text = "Press E to Disembark";
             }
             else
             {
-                interactionUI.SetActive(false);
-                interactionPrompt.text = "Press E to ride the boat";
+                secondInteractionPrompt.gameObject.SetActive(false);
+                secondInteractionPrompt.text = "";
             }
+        }
+        else
+        {
+            interactionPrompt.gameObject.SetActive(true);
+            interactionPrompt.text = "Press E to ride the boat";
+        }
 
-            if (Input.GetKeyDown(KeyCode.E))
+        if (Input.GetKeyDown(KeyCode.E))
+        {
+            if (isOnBoat)
             {
-                if (isOnBoat)
-                {
-                    TryDisembark();
-                }
-                else
-                {
-                    BoardBoat();
-                }
+                TryDisembark();
+            }
+            else
+            {
+                BoardBoat();
             }
         }
     }
+    else
+    {
+        interactionUI.SetActive(false); // Hide the UI when not near the boat
+    }
+}
+
+
 
     private void BoardBoat()
     {
@@ -90,46 +106,51 @@ public class BoatInteraction : MonoBehaviour
         }
     }
 
-   private void TryDisembark()
+  private void TryDisembark()
 {
-    // Find the closest port position
     Transform closestPort = GetClosestPort();
 
-    // Check if the boat is near the closest port position
     if (Vector3.Distance(boat.transform.position, closestPort.position) <= portProximityThreshold)
     {
-        // Find the corresponding land position for the closest port
         Transform correspondingLandPosition = playerLandPositions[System.Array.IndexOf(portPositions, closestPort)];
 
         isOnBoat = false;
+        isNearBoat = false;
 
         player.SetActive(true);
         player.transform.position = correspondingLandPosition.position;
 
-        // Do not reset the boat's position, so it stays where the player disembarked
-        // boat.transform.position = boatStartPosition; // Remove this line
+        boat.transform.rotation = boatStartRotation;
 
-        boat.transform.rotation = boatStartRotation; // You can keep rotation resetting if needed
-
-        // Disable boat controls
         boat.GetComponent<BoatController>().enabled = false;
-        
-        // Stop the boat's movement immediately
-        /*
-        Rigidbody boatRb = boat.GetComponent<Rigidbody>();
-        boatRb.linearVelocity = Vector3.zero; // Stop linear velocity
-        boatRb.angularVelocity = Vector3.zero; // Stop angular velocity
-        */
 
-        // Switch cameras
+        Rigidbody boatRb = boat.GetComponent<Rigidbody>();
+        boatRb.linearVelocity = Vector3.zero;
+        boatRb.angularVelocity = Vector3.zero;
+
         boatCamera.enabled = false;
         playerCamera.enabled = true;
+
+        // Reset UI prompts
+        if (interactionPrompt != null)
+        {
+            interactionPrompt.text = ""; // Clear the text
+            interactionPrompt.gameObject.SetActive(false); // Hide the prompt
+        }
+
+        if (secondInteractionPrompt != null)
+        {
+            secondInteractionPrompt.text = ""; // Clear any lingering text
+            secondInteractionPrompt.gameObject.SetActive(false); // Hide it
+        }
     }
     else
     {
         Debug.Log("You can only disembark when the boat is at the port!");
     }
 }
+
+
 
 
     private Transform GetClosestPort()
@@ -150,30 +171,47 @@ public class BoatInteraction : MonoBehaviour
         return closestPort;
     }
 
-    private void OnTriggerEnter(Collider other)
+   private void OnTriggerEnter(Collider other)
+{
+    if (other.gameObject == player)
     {
-        if (other.gameObject == player)
-        {
-            isNearBoat = true;
+        isNearBoat = true;
 
-            if (interactionPrompt != null)
-            {
-                interactionPrompt.gameObject.SetActive(true);
-                interactionPrompt.text = isOnBoat ? "Press 'E' to disembark" : "Press 'E' to ride the boat";
-            }
+        if (interactionPrompt != null)
+        {
+            interactionPrompt.gameObject.SetActive(true);
+            interactionPrompt.text = isOnBoat ? "Press E to disembark" : "Press E to ride the boat";
+        }
+
+        if (secondInteractionPrompt != null)
+        {
+            secondInteractionPrompt.gameObject.SetActive(false); // Hide the second prompt
+            secondInteractionPrompt.text = ""; // Clear any lingering text
         }
     }
+}
+
 
     private void OnTriggerExit(Collider other)
+{
+    if (other.gameObject == player)
     {
-        if (other.gameObject == player)
-        {
-            isNearBoat = false;
+        isNearBoat = false;
 
-            if (interactionPrompt != null)
-            {
-                interactionPrompt.gameObject.SetActive(false);
-            }
+        if (interactionPrompt != null)
+        {
+            interactionPrompt.text = ""; // Clear the text
+            interactionPrompt.gameObject.SetActive(false); // Hide it
+        }
+
+        if (secondInteractionPrompt != null)
+        {
+            secondInteractionPrompt.text = ""; // Clear any lingering text
+            secondInteractionPrompt.gameObject.SetActive(false); // Hide it
         }
     }
+}
+
+
+
 }
