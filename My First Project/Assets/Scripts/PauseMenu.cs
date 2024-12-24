@@ -1,20 +1,37 @@
 using UnityEngine;
-using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 public class PauseMenu : MonoBehaviour
 {
-    public GameObject pauseMenuUI; // Reference to the Pause Menu UI
-    public MonoBehaviour playerController; // Reference to the script controlling player movement and camera
-    public GameObject defaultButton; // Button to select when the menu opens (optional)
+    public GameObject pauseMenuUI; 
+    public MonoBehaviour playerController; 
+    public GameObject settingsPanel; 
+    public Slider masterVolumeSlider; 
+    public Slider musicVolumeSlider; 
+    public AudioSource musicAudioSource; 
 
     private bool isPaused = false;
+    private bool isInSettings = false; // Track if the settings panel is open
+
+    void Start()
+    {
+        // Ensure default volumes are set
+        AudioListener.volume = 1f; 
+        masterVolumeSlider.value = AudioListener.volume;
+
+        musicAudioSource.volume = 0.5f; 
+        musicVolumeSlider.value = musicAudioSource.volume;
+    }
 
     void Update()
     {
-        // Toggle pause menu with Escape key
         if (Input.GetKeyDown(KeyCode.Escape))
         {
-            if (isPaused)
+            if (isInSettings)
+            {
+                CloseSettings(); // Close settings if open
+            }
+            else if (isPaused)
             {
                 Resume();
             }
@@ -27,22 +44,25 @@ public class PauseMenu : MonoBehaviour
 
     public void Pause()
     {
-        pauseMenuUI.SetActive(true); // Display the pause menu
-        Time.timeScale = 0f; // Freeze game time
-        DisablePlayerController(); // Disable player controls
-        Cursor.lockState = CursorLockMode.None; // Unlock the cursor
-        Cursor.visible = true; // Make the cursor visible
-        ResetButtonSelection(); // Reset button selection
+        if (isInSettings) return; // Don't allow Pause if in Settings
+
+        pauseMenuUI.SetActive(true); 
+        Time.timeScale = 0f; 
+        DisablePlayerController(); 
+        Cursor.lockState = CursorLockMode.None; 
+        Cursor.visible = true; 
         isPaused = true;
     }
 
     public void Resume()
     {
-        pauseMenuUI.SetActive(false); // Hide the pause menu
-        Time.timeScale = 1f; // Resume game time
-        EnablePlayerController(); // Re-enable player controls
-        Cursor.lockState = CursorLockMode.Locked; // Lock the cursor back to the game view
-        Cursor.visible = false; // Hide the cursor
+        if (isInSettings) return; // Don't allow Resume if in Settings
+
+        pauseMenuUI.SetActive(false); 
+        Time.timeScale = 1f; 
+        EnablePlayerController(); 
+        Cursor.lockState = CursorLockMode.Locked; 
+        Cursor.visible = false; 
         isPaused = false;
     }
 
@@ -50,7 +70,7 @@ public class PauseMenu : MonoBehaviour
     {
         if (playerController != null)
         {
-            playerController.enabled = false; // Disable the player controller script
+            playerController.enabled = false; 
         }
     }
 
@@ -58,25 +78,44 @@ public class PauseMenu : MonoBehaviour
     {
         if (playerController != null)
         {
-            playerController.enabled = true; // Enable the player controller script
+            playerController.enabled = true; 
         }
     }
 
-    private void ResetButtonSelection()
+    public void ShowSettings()
     {
-        // Deselect any currently selected button
-        EventSystem.current.SetSelectedGameObject(null);
+        pauseMenuUI.SetActive(false); // Deactivate Pause Menu
+        settingsPanel.SetActive(true); 
+        isInSettings = true; 
+    }
 
-        // Optionally, set a default button to be selected
-        if (defaultButton != null)
+    public void CloseSettings()
+    {
+        settingsPanel.SetActive(false); 
+        pauseMenuUI.SetActive(true); // Reactivate Pause Menu
+        isInSettings = false; 
+    }
+
+    public void UpdateMasterVolume(float volume)
+    {
+        AudioListener.volume = volume; 
+    }
+
+    public void UpdateMusicVolume(float volume)
+    {
+        if (musicAudioSource != null)
         {
-            EventSystem.current.SetSelectedGameObject(defaultButton);
+            musicAudioSource.volume = volume; 
         }
     }
 
     public void QuitGame()
     {
-        Debug.Log("Quitting game..."); // Debug message for testing in the editor
-        Application.Quit(); // Quit the application
+        Debug.Log("Quitting game...");
+        #if UNITY_EDITOR
+            UnityEditor.EditorApplication.isPlaying = false;
+        #else
+            Application.Quit();
+        #endif
     }
 }
