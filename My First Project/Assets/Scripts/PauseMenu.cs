@@ -3,23 +3,26 @@ using UnityEngine.UI;
 
 public class PauseMenu : MonoBehaviour
 {
-    public GameObject pauseMenuUI; 
-    public MonoBehaviour playerController; 
-    public GameObject settingsPanel; 
-    public Slider masterVolumeSlider; 
-    public Slider musicVolumeSlider; 
-    public AudioSource musicAudioSource; 
+    public GameObject pauseMenuUI;
+    public MonoBehaviour playerController;
+    public GameObject settingsPanel;
+    public Slider masterVolumeSlider;
+    public Slider musicVolumeSlider;
+    public AudioSource musicAudioSource;
 
+    public Camera playerCamera; // Reference to the player's camera
+    public Camera boatCamera;   // Reference to the boat's camera
+    public GameObject player;   // Reference to the player GameObject
     private bool isPaused = false;
-    private bool isInSettings = false; // Track if the settings panel is open
+    private bool isInSettings = false;
+    private bool wasOnBoat = false; // Track if the player was on the boat when pausing
 
     void Start()
     {
         // Ensure default volumes are set
-        AudioListener.volume = 1f; 
         masterVolumeSlider.value = AudioListener.volume;
 
-        musicAudioSource.volume = 0.5f; 
+        musicAudioSource.volume = 0.5f;
         musicVolumeSlider.value = musicAudioSource.volume;
     }
 
@@ -46,11 +49,25 @@ public class PauseMenu : MonoBehaviour
     {
         if (isInSettings) return; // Don't allow Pause if in Settings
 
-        pauseMenuUI.SetActive(true); 
-        Time.timeScale = 0f; 
-        DisablePlayerController(); 
-        Cursor.lockState = CursorLockMode.None; 
-        Cursor.visible = true; 
+        // Detect which camera is active and switch to the player's camera
+        if (boatCamera.enabled)
+        {
+            wasOnBoat = true;
+            boatCamera.enabled = false;
+            playerCamera.enabled = true;
+
+            // Reactivate the player GameObject for rendering the menu
+            if (!player.activeSelf)
+            {
+                player.SetActive(true);
+            }
+        }
+
+        pauseMenuUI.SetActive(true);
+        Time.timeScale = 0f;
+        DisablePlayerController();
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
         isPaused = true;
     }
 
@@ -58,11 +75,23 @@ public class PauseMenu : MonoBehaviour
     {
         if (isInSettings) return; // Don't allow Resume if in Settings
 
-        pauseMenuUI.SetActive(false); 
-        Time.timeScale = 1f; 
-        EnablePlayerController(); 
-        Cursor.lockState = CursorLockMode.Locked; 
-        Cursor.visible = false; 
+        pauseMenuUI.SetActive(false);
+        Time.timeScale = 1f;
+        EnablePlayerController();
+
+        // Restore the previous camera state
+        if (wasOnBoat)
+        {
+            playerCamera.enabled = false;
+            boatCamera.enabled = true;
+
+            // Hide the player GameObject again after resuming
+            player.SetActive(false);
+            wasOnBoat = false;
+        }
+
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
         isPaused = false;
     }
 
@@ -70,7 +99,7 @@ public class PauseMenu : MonoBehaviour
     {
         if (playerController != null)
         {
-            playerController.enabled = false; 
+            playerController.enabled = false;
         }
     }
 
@@ -78,44 +107,44 @@ public class PauseMenu : MonoBehaviour
     {
         if (playerController != null)
         {
-            playerController.enabled = true; 
+            playerController.enabled = true;
         }
     }
 
     public void ShowSettings()
     {
         pauseMenuUI.SetActive(false); // Deactivate Pause Menu
-        settingsPanel.SetActive(true); 
-        isInSettings = true; 
+        settingsPanel.SetActive(true);
+        isInSettings = true;
     }
 
     public void CloseSettings()
     {
-        settingsPanel.SetActive(false); 
+        settingsPanel.SetActive(false);
         pauseMenuUI.SetActive(true); // Reactivate Pause Menu
-        isInSettings = false; 
+        isInSettings = false;
     }
 
     public void UpdateMasterVolume(float volume)
     {
-        AudioListener.volume = volume; 
+        AudioListener.volume = volume;
     }
 
     public void UpdateMusicVolume(float volume)
     {
         if (musicAudioSource != null)
         {
-            musicAudioSource.volume = volume; 
+            musicAudioSource.volume = volume;
         }
     }
 
     public void QuitGame()
     {
         Debug.Log("Quitting game...");
-        #if UNITY_EDITOR
-            UnityEditor.EditorApplication.isPlaying = false;
-        #else
-            Application.Quit();
-        #endif
+#if UNITY_EDITOR
+        UnityEditor.EditorApplication.isPlaying = false;
+#else
+        Application.Quit();
+#endif
     }
 }
