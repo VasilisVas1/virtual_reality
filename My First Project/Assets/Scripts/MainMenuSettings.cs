@@ -72,6 +72,9 @@ namespace Unity.FantasyKingdom
         {
             Screen.fullScreen = isFullscreen;
             PlayerPrefs.SetInt("Fullscreen", isFullscreen ? 1 : 0);
+            //Screen.fullScreenMode = isFullscreen ? FullScreenMode.ExclusiveFullScreen : FullScreenMode.Windowed;
+            //Screen.fullScreen = isFullscreen;
+            //Screen.fullScreen=!Screen.fullScreen;
             PlayerPrefs.Save();
         }
 
