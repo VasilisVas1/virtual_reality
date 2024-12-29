@@ -22,7 +22,7 @@ public class PauseMenu : MonoBehaviour
         // Ensure default volumes are set
         masterVolumeSlider.value = AudioListener.volume;
 
-        musicAudioSource.volume = 0.5f;
+        //musicAudioSource.volume = 0.5f;
         musicVolumeSlider.value = musicAudioSource.volume;
     }
 

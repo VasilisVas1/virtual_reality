@@ -6,16 +6,19 @@ namespace Unity.FantasyKingdom
     public class MainMenuSettings : MonoBehaviour
     {
         public Slider masterVolumeSlider;
+        public Slider musicVolumeSlider;  // Add a slider for the music volume
         public Dropdown resolutionDropdown;
         public Dropdown qualityDropdown;
         public Toggle fullscreenToggle;
         public GameObject settingsPanel; // Reference to the settings panel
         public GameObject mainMenuPanel; // Reference to the main menu panel
+        public AudioSource musicAudioSource; // Reference to the music audio source
 
         void Start()
         {
             // Ensure sliders and toggles are set to current settings
             masterVolumeSlider.value = AudioListener.volume;
+            musicVolumeSlider.value = musicAudioSource.volume;  // Set the music slider value to the current music volume
 
             // Setup resolution dropdown
             resolutionDropdown.ClearOptions();
@@ -53,6 +56,16 @@ namespace Unity.FantasyKingdom
             PlayerPrefs.Save();
         }
 
+        public void UpdateMusicVolume(float volume)
+        {
+            if (musicAudioSource != null)
+            {
+                musicAudioSource.volume = volume;  // Update the music volume
+            }
+            PlayerPrefs.SetFloat("MusicVolume", volume);
+            PlayerPrefs.Save();
+        }
+
         public void ChangeResolution(int index)
         {
             Resolution newResolution = Screen.resolutions[index];
@@ -72,9 +85,6 @@ namespace Unity.FantasyKingdom
         {
             Screen.fullScreen = isFullscreen;
             PlayerPrefs.SetInt("Fullscreen", isFullscreen ? 1 : 0);
-            //Screen.fullScreenMode = isFullscreen ? FullScreenMode.ExclusiveFullScreen : FullScreenMode.Windowed;
-            //Screen.fullScreen = isFullscreen;
-            //Screen.fullScreen=!Screen.fullScreen;
             PlayerPrefs.Save();
         }
 
@@ -83,6 +93,10 @@ namespace Unity.FantasyKingdom
             // Load saved master volume
             if (PlayerPrefs.HasKey("MasterVolume"))
                 AudioListener.volume = PlayerPrefs.GetFloat("MasterVolume");
+
+            // Load saved music volume
+            if (PlayerPrefs.HasKey("MusicVolume"))
+                musicAudioSource.volume = PlayerPrefs.GetFloat("MusicVolume");
 
             // Load saved resolution
             if (PlayerPrefs.HasKey("ResolutionIndex"))

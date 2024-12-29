@@ -106,6 +106,7 @@ public class BoatInteraction : MonoBehaviour
         }
     }
 
+
   private void TryDisembark()
 {
     Transform closestPort = GetClosestPort();
@@ -149,9 +150,6 @@ public class BoatInteraction : MonoBehaviour
         Debug.Log("You can only disembark when the boat is at the port!");
     }
 }
-
-
-
 
     private Transform GetClosestPort()
     {
