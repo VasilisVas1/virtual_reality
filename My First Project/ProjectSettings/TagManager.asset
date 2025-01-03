@@ -18,6 +18,7 @@ TagManager:
   - Fountain
   - BellZone
   - Water
+  - Parrot
   layers:
   - Default
   - TransparentFX
