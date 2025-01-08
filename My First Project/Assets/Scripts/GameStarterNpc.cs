@@ -24,6 +24,11 @@ namespace Unity.FantasyKingdom
         private float taskTimer;
 
         public GameObject potato;            // The potato object to be activated
+        public GameObject invisibleWall;            // The potato object to be activated
+        public GameObject invisibleWall2;            // The potato object to be activated
+
+
+
         public GameObject[] parrots;         // Array of parrot GameObjects to be activated
 
         [Header("Fish Settings")]
@@ -34,6 +39,11 @@ namespace Unity.FantasyKingdom
 
         private Coroutine taskTimerCoroutine; // Reference for the timer coroutine
 
+        [Header("Music Settings")]
+        public AudioSource backgroundAudioSource; // The AudioSource component
+        public AudioClip newBackgroundMusic;      // The new music to play
+
+
         void Start()
         {
             interactionUI.SetActive(false);  // Hide "Press E to Start Tasks" initially
@@ -42,6 +52,11 @@ namespace Unity.FantasyKingdom
 
             // Deactivate potato and parrots at the start
             potato.SetActive(false);
+            invisibleWall.SetActive(true);
+            invisibleWall2.SetActive(true);
+
+
+
             foreach (GameObject parrot in parrots)
             {
                 parrot.SetActive(false);
@@ -75,6 +90,11 @@ namespace Unity.FantasyKingdom
 
             // Activate the potato and parrots
             potato.SetActive(true);
+            invisibleWall.SetActive(false);
+            invisibleWall2.SetActive(false);
+
+
+
             foreach (GameObject parrot in parrots)
             {
                 parrot.SetActive(true);
@@ -97,6 +117,13 @@ namespace Unity.FantasyKingdom
             {
                 wheelbarrow.SetActive(true);
             }
+
+            if (backgroundAudioSource != null && newBackgroundMusic != null)
+{
+    backgroundAudioSource.clip = newBackgroundMusic; // Assign the new audio
+    backgroundAudioSource.Play();                   // Start playing the new audio
+}
+
 
             // Hide interaction UI
             interactionUI.SetActive(false);
@@ -131,11 +158,15 @@ namespace Unity.FantasyKingdom
         }
 
         void UpdateTimerDisplay()
-        {
-            int minutes = Mathf.FloorToInt(taskTimer / 60);
-            int seconds = Mathf.FloorToInt(taskTimer % 60);
-            timerText.text = $"Time Left: {minutes:00}:{seconds:00}";
-        }
+{
+    int minutes = Mathf.FloorToInt(taskTimer / 60); // Get minutes
+    int seconds = Mathf.FloorToInt(taskTimer % 60); // Get seconds
+    int milliseconds = Mathf.FloorToInt((taskTimer % 1) * 1000); // Get milliseconds
+
+    // Update timer text with microseconds
+    timerText.text = $"Time Left: {minutes:00}:{seconds:00}:{milliseconds:000}";
+}
+
 
         void EndGame()
         {
@@ -155,7 +186,7 @@ namespace Unity.FantasyKingdom
                 if (!gameStarted)
                 {
                     interactionUI.SetActive(true); // Show "Press E to Start Tasks"
-                    interactionText.text = $"Press E to Start Tasks with {npcName}";
+                    interactionText.text = $"Press E to Start Game ({npcName})";
                 }
             }
         }

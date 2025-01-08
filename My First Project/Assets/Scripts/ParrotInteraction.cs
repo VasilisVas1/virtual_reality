@@ -7,11 +7,12 @@ namespace Unity.FantasyKingdom
     {
         public GameObject interactionUI;
         public TMP_Text taskListText;
-        public string taskDescription = "Find A Parrot with Personality";
+        public string taskDescription = "Find the Personality Parrot";
         public AudioClip personalitySound;
         public AudioClip normalParrotSound;
 
-        private bool isPersonalityParrot = false;
+        public bool isPersonalityParrot = false; // Set in the Inspector for the Personality Parrot
+
         private bool playerInRange = false;
         private bool canPickUp = false;
         private bool taskCompleted = false;
@@ -20,33 +21,13 @@ namespace Unity.FantasyKingdom
         private void Awake()
         {
             audioSource = GetComponent<AudioSource>();
-
-            // Find the ParrotManager in the scene
-            ParrotManager parrotManager = FindObjectOfType<ParrotManager>();
-
-            if (parrotManager != null)
-            {
-                // Check if the current parrot is the personality parrot
-                isPersonalityParrot = (parrotManager.personalityParrot == gameObject);
-            }
-            else
-            {
-                Debug.LogError("ParrotManager not found! Make sure there is a ParrotManager in the scene.");
-            }
         }
 
         private void Update()
         {
             if (playerInRange && Input.GetKeyDown(KeyCode.E))
             {
-                if (canPickUp)
-                {
-                    PickUpParrot();
-                }
-                else
-                {
-                    InteractWithParrot();
-                }
+                InteractWithParrot();
             }
         }
 
@@ -54,36 +35,40 @@ namespace Unity.FantasyKingdom
         {
             if (isPersonalityParrot)
             {
-                if (!canPickUp) // Ensure sound and interaction happen only once
+                if (!canPickUp) // Play the personality sound and allow pickup
                 {
-                    if (personalitySound != null && !audioSource.isPlaying)
-                    {
-                        audioSource.clip = personalitySound;
-                        audioSource.Play();
-                        StartCoroutine(EnablePickUpAfterSound(audioSource.clip.length));
-                    }
+                    PlaySound(personalitySound);
+                    StartCoroutine(EnablePickUpAfterSound(audioSource.clip.length));
+                }
+                else
+                {
+                    PickUpParrot();
                 }
             }
             else
             {
-                if (normalParrotSound != null && !audioSource.isPlaying)
-                {
-                    audioSource.clip = normalParrotSound;
-                    audioSource.Play();
-                }
+                // Regular parrot interaction
+                PlaySound(normalParrotSound);
+                Debug.Log("This is a normal parrot.");
+            }
+        }
+
+        private void PlaySound(AudioClip clip)
+        {
+            if (clip != null && audioSource != null && !audioSource.isPlaying)
+            {
+                audioSource.clip = clip;
+                audioSource.Play();
             }
         }
 
         private System.Collections.IEnumerator EnablePickUpAfterSound(float delay)
         {
             yield return new WaitForSeconds(delay);
-            if (isPersonalityParrot)
+            canPickUp = true;
+            if (interactionUI != null)
             {
-                canPickUp = true;
-                if (interactionUI != null)
-                {
-                    interactionUI.GetComponent<TMP_Text>().text = "Press E to Pick Up";
-                }
+                interactionUI.GetComponent<TMP_Text>().text = "Press E to Pick Up";
             }
         }
 
@@ -91,7 +76,7 @@ namespace Unity.FantasyKingdom
         {
             taskCompleted = true;
 
-            // Update task in UI (turn green)
+            // Update task in UI
             if (taskListText != null)
             {
                 string completedTask = $"<color=green>{taskDescription}</color>";
@@ -107,47 +92,20 @@ namespace Unity.FantasyKingdom
         }
 
         private void OnTriggerEnter(Collider other)
-{
-    if (other.CompareTag("Player"))
-    {
-        playerInRange = true;
-
-        // Make the parrot look at the player
-        LookAtPlayer(other.transform);
-
-        if (interactionUI != null)
         {
-            interactionUI.SetActive(true);
+            if (other.CompareTag("Player"))
+            {
+                playerInRange = true;
 
-            // Show appropriate interaction text
-            if (canPickUp)
-            {
-                interactionUI.GetComponent<TMP_Text>().text = "Press E to Pick Up";
-            }
-            else
-            {
-                interactionUI.GetComponent<TMP_Text>().text = "Press E to Feed";
+                if (interactionUI != null)
+                {
+                    interactionUI.SetActive(true);
+                    interactionUI.GetComponent<TMP_Text>().text = isPersonalityParrot && canPickUp
+                        ? "Press E to Pick Up"
+                        : "Press E to Feed";
+                }
             }
         }
-    }
-}
-
-private void LookAtPlayer(Transform playerTransform)
-{
-    // Get the direction towards the player
-    Vector3 directionToPlayer = playerTransform.position - transform.position;
-
-    // Remove the y component to keep the rotation on the Y axis only
-    directionToPlayer.y = 0;
-
-    // Calculate the target rotation to face the player
-    Quaternion targetRotation = Quaternion.LookRotation(directionToPlayer);
-
-    // Apply the target rotation directly to the parrot's transform
-    transform.rotation = targetRotation;
-}
-
-
 
         private void OnTriggerExit(Collider other)
         {

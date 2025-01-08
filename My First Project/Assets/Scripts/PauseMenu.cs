@@ -10,6 +10,9 @@ public class PauseMenu : MonoBehaviour
     public Slider musicVolumeSlider;
     public AudioSource musicAudioSource;
 
+    public GameObject taskListText;    // Display tasks to the player
+    public GameObject timerText;       
+
     public Camera playerCamera; // Reference to the player's camera
     public Camera boatCamera;   // Reference to the boat's camera
     public GameObject player;   // Reference to the player GameObject
@@ -63,6 +66,11 @@ public class PauseMenu : MonoBehaviour
             }
         }
 
+        if(taskListText.gameObject.activeSelf){
+            taskListText.gameObject.SetActive(false);
+            timerText.gameObject.SetActive(false);
+        }
+
         pauseMenuUI.SetActive(true);
         Time.timeScale = 0f;
         DisablePlayerController();
@@ -75,6 +83,10 @@ public class PauseMenu : MonoBehaviour
     {
         if (isInSettings) return; // Don't allow Resume if in Settings
 
+        if(!taskListText.gameObject.activeSelf){
+            taskListText.gameObject.SetActive(true);
+            timerText.gameObject.SetActive(true);
+        }
         pauseMenuUI.SetActive(false);
         Time.timeScale = 1f;
         EnablePlayerController();
