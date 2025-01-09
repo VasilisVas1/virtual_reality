@@ -21,6 +21,9 @@ namespace Unity.FantasyKingdom
         private bool taskCompleted = false; // Whether the task has been completed
         private Transform playerTransform;  // Reference to the player transform
 
+        public GameStarterNPC gameStarterNPC; // Reference to the GameStarterNPC script
+
+
         private void Start()
         {
             fishAudio.volume = 0f; // Start with the audio muted
@@ -57,6 +60,11 @@ namespace Unity.FantasyKingdom
             // Update the task in the UI (turn it green)
             string completedTask = $"<color=green>{taskDescription}</color>";
             taskListText.text = taskListText.text.Replace(taskDescription, completedTask);
+
+
+            
+            gameStarterNPC.TaskCompleted(1); // Assuming this is the first task in the list
+
 
             // Hide the fish and interaction UI
             gameObject.SetActive(false);

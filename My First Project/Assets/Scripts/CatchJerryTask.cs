@@ -13,6 +13,9 @@ namespace Unity.FantasyKingdom
         private bool playerInRange = false; // Tracks if the player is in range of Jerry
         private bool taskCompleted = false; // Tracks if the task is completed
 
+        public GameStarterNPC gameStarterNPC; // Reference to the GameStarterNPC script
+
+
         private void Update()
         {
             // Check if the player presses E while in range and the task is not completed
@@ -31,6 +34,8 @@ namespace Unity.FantasyKingdom
             {
                 string completedTask = $"<color=green>{taskDescription}</color>";
                 taskListText.text = taskListText.text.Replace(taskDescription, completedTask);
+                gameStarterNPC.TaskCompleted(5); // Assuming this is the first task in the list
+
             }
 
             // Hide the interaction UI

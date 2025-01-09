@@ -17,5 +17,11 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Demo.unity
     guid: 23d8661265deed742959416ea58475f7
+  - enabled: 1
+    path: Assets/Scenes/FailureScene.unity
+    guid: 00adcf73beb26894aa49fd23ac83e810
+  - enabled: 1
+    path: Assets/Scenes/VictoryScene.unity
+    guid: a7ed8d2588f1dbd4dacd018a6ed4682f
   m_configObjects: {}
   m_UseUCBPForAssetBundles: 0

@@ -18,6 +18,9 @@ namespace Unity.FantasyKingdom
         private bool taskCompleted = false;
         private AudioSource audioSource;
 
+        public GameStarterNPC gameStarterNPC; // Reference to the GameStarterNPC script
+
+
         private void Awake()
         {
             audioSource = GetComponent<AudioSource>();
@@ -81,6 +84,9 @@ namespace Unity.FantasyKingdom
             {
                 string completedTask = $"<color=green>{taskDescription}</color>";
                 taskListText.text = taskListText.text.Replace(taskDescription, completedTask);
+
+                gameStarterNPC.TaskCompleted(2); // Assuming this is the first task in the list
+
             }
 
             // Hide the parrot and interaction UI

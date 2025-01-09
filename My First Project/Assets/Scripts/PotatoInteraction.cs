@@ -12,6 +12,8 @@ public GameObject interactionUI;  // "Press E to Pick Up" message
     private bool playerInRange = false; // Check if player is near the potato
     private bool taskCompleted = false; // Check if task is done
 
+    public GameStarterNPC gameStarterNPC; // Reference to the GameStarterNPC script
+
     private void Start()
     {
         interactionUI.SetActive(false); // Hide interaction message at the start
@@ -32,6 +34,9 @@ public GameObject interactionUI;  // "Press E to Pick Up" message
         // Update the task in the UI (turn it green)
         string completedTask = $"<color=green>{taskDescription}</color>";
         taskListText.text = taskListText.text.Replace(taskDescription, completedTask);
+
+        gameStarterNPC.TaskCompleted(0); // Assuming this is the first task in the list
+
 
         // Hide the potato
         gameObject.SetActive(false);

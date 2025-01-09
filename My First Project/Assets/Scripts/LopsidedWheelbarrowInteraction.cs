@@ -13,6 +13,9 @@ namespace Unity.FantasyKingdom
         private bool playerInRange = false; // Whether the player is near the wheelbarrow
         private bool taskCompleted = false; // Whether the task has been completed
 
+        public GameStarterNPC gameStarterNPC; // Reference to the GameStarterNPC script
+
+
         private void Start()
         {
             interactionUI.SetActive(false); // Hide interaction UI initially
@@ -36,6 +39,8 @@ namespace Unity.FantasyKingdom
             // Update the task in the UI (turn it green)
             string completedTask = $"<color=green>{taskDescription}</color>";
             taskListText.text = taskListText.text.Replace(taskDescription, completedTask);
+            gameStarterNPC.TaskCompleted(4); // Assuming this is the first task in the list
+
 
             // Hide the wheelbarrow and interaction UI
             gameObject.SetActive(false);

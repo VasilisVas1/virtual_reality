@@ -8,8 +8,11 @@ namespace Unity.FantasyKingdom
     {
         public GameObject fixedShipPrefab;    // Reference to the fixed ship prefab
         public TMP_Text taskListText;         // Reference to the task list UI text
-        public string taskDescription = "Fix Shinked Pirate Ship"; // Task description
+        public string taskDescription = "Fix Sunken Pirate Ship"; // Task description
         public GameObject interactionText;    // Text to display interaction message
+
+        public GameStarterNPC gameStarterNPC; // Reference to the GameStarterNPC script
+
 
 
         private FixPoint[] fixPoints;        // Array of fix points
@@ -70,6 +73,8 @@ namespace Unity.FantasyKingdom
             {
                 string completedTask = $"<color=green>{taskDescription}</color>";
                 taskListText.text = taskListText.text.Replace(taskDescription, completedTask);
+                gameStarterNPC.TaskCompleted(3); // Assuming this is the first task in the list
+
             }
 
         }

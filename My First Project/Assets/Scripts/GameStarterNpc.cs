@@ -1,6 +1,7 @@
 using System.Collections;
 using UnityEngine;
 using TMPro;
+using UnityEngine.SceneManagement; // For loading scenes
 
 namespace Unity.FantasyKingdom
 {
@@ -18,6 +19,7 @@ namespace Unity.FantasyKingdom
 
         private bool playerInRange = false;  // Is the player in range of the NPC
         private bool gameStarted = false;    // Has the game already started
+        private bool[] taskCompleted;        // Task completion status
 
         [Header("Game Settings")]
         public float taskTimerDuration = 300f; // Task timer duration in seconds
@@ -26,15 +28,8 @@ namespace Unity.FantasyKingdom
         public GameObject potato;            // The potato object to be activated
         public GameObject invisibleWall;            // The potato object to be activated
         public GameObject invisibleWall2;            // The potato object to be activated
-
-
-
         public GameObject[] parrots;         // Array of parrot GameObjects to be activated
-
-        [Header("Fish Settings")]
         public GameObject[] fishes;         // Array of fish GameObjects to be activated
-
-        [Header("Wheelbarrow Settings")]
         public GameObject[] lopsidedWheelbarrows; // Array of lopsided wheelbarrow GameObjects to be activated
 
         private Coroutine taskTimerCoroutine; // Reference for the timer coroutine
@@ -43,36 +38,22 @@ namespace Unity.FantasyKingdom
         public AudioSource backgroundAudioSource; // The AudioSource component
         public AudioClip newBackgroundMusic;      // The new music to play
 
-
         void Start()
         {
             interactionUI.SetActive(false);  // Hide "Press E to Start Tasks" initially
             taskListText.gameObject.SetActive(false); // Hide tasks list initially
             timerText.gameObject.SetActive(false);    // Hide timer initially
 
-            // Deactivate potato and parrots at the start
+            // Deactivate objects at the start
             potato.SetActive(false);
             invisibleWall.SetActive(true);
             invisibleWall2.SetActive(true);
+            foreach (GameObject parrot in parrots) parrot.SetActive(false);
+            foreach (GameObject fish in fishes) fish.SetActive(false);
+            foreach (GameObject wheelbarrow in lopsidedWheelbarrows) wheelbarrow.SetActive(false);
 
-
-
-            foreach (GameObject parrot in parrots)
-            {
-                parrot.SetActive(false);
-            }
-
-            // Deactivate all fishes at the start
-            foreach (GameObject fish in fishes)
-            {
-                fish.SetActive(false);
-            }
-
-            // Deactivate all lopsided wheelbarrows at the start
-            foreach (GameObject wheelbarrow in lopsidedWheelbarrows)
-            {
-                wheelbarrow.SetActive(false);
-            }
+            // Initialize task completion array
+            taskCompleted = new bool[tasks.Length];
         }
 
         void Update()
@@ -82,24 +63,23 @@ namespace Unity.FantasyKingdom
             {
                 StartGame();
             }
+
+            // Check if all tasks are completed
+            if (gameStarted && AreAllTasksCompleted())
+            {
+                WinGame();
+            }
         }
 
         void StartGame()
         {
             gameStarted = true;
 
-            // Activate the potato and parrots
+            // Activate game objects
             potato.SetActive(true);
             invisibleWall.SetActive(false);
             invisibleWall2.SetActive(false);
-
-
-
-            foreach (GameObject parrot in parrots)
-            {
-                parrot.SetActive(true);
-            }
-
+            foreach (GameObject parrot in parrots) parrot.SetActive(true);
             foreach (GameObject fish in fishes)
 {
     fish.SetActive(true); // Reactivate the fish
@@ -109,21 +89,14 @@ namespace Unity.FantasyKingdom
         audioSource.Stop(); // Ensure a fresh start
         audioSource.Play(); // Start playback again
     }
-}
+}            foreach (GameObject wheelbarrow in lopsidedWheelbarrows) wheelbarrow.SetActive(true);
 
-
-            // Activate all lopsided wheelbarrows
-            foreach (GameObject wheelbarrow in lopsidedWheelbarrows)
-            {
-                wheelbarrow.SetActive(true);
-            }
-
+            // Play background music
             if (backgroundAudioSource != null && newBackgroundMusic != null)
-{
-    backgroundAudioSource.clip = newBackgroundMusic; // Assign the new audio
-    backgroundAudioSource.Play();                   // Start playing the new audio
-}
-
+            {
+                backgroundAudioSource.clip = newBackgroundMusic;
+                backgroundAudioSource.Play();
+            }
 
             // Hide interaction UI
             interactionUI.SetActive(false);
@@ -131,9 +104,9 @@ namespace Unity.FantasyKingdom
             // Display task list
             taskListText.gameObject.SetActive(true);
             taskListText.text = "Tasks:\n";
-            foreach (string task in tasks)
+            for (int i = 0; i < tasks.Length; i++)
             {
-                taskListText.text += $"- {task}\n";
+                taskListText.text += $"- {tasks[i]}\n";
             }
 
             // Show and initialize the timer
@@ -158,35 +131,86 @@ namespace Unity.FantasyKingdom
         }
 
         void UpdateTimerDisplay()
-{
-    int minutes = Mathf.FloorToInt(taskTimer / 60); // Get minutes
-    int seconds = Mathf.FloorToInt(taskTimer % 60); // Get seconds
-    int milliseconds = Mathf.FloorToInt((taskTimer % 1) * 1000); // Get milliseconds
+        {
+            int minutes = Mathf.FloorToInt(taskTimer / 60);
+            int seconds = Mathf.FloorToInt(taskTimer % 60);
+            int milliseconds = Mathf.FloorToInt((taskTimer % 1) * 1000);
 
-    // Update timer text with microseconds
-    timerText.text = $"Time Left: {minutes:00}:{seconds:00}:{milliseconds:000}";
-}
+            timerText.text = $"Time Left: {minutes:00}:{seconds:00}:{milliseconds:000}";
+        }
 
-
+    
         void EndGame()
         {
             Debug.Log("Time's up! Tasks are finished.");
+            if (AreAllTasksCompleted())
+            {
+                WinGame();
+            }
+            else
+            {
+                LoseGame();
+            }
+        }
 
-            // Hide the timer
-            timerText.gameObject.SetActive(false);
+        void WinGame()
+        {
+            // Calculate completion time
+            float completionTime = taskTimerDuration - taskTimer;
+            GameData.CompletionTime = completionTime;
+            // Unlock the cursor
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
 
-            // Add logic here for ending the game or showing results
+            // Load VictoryScene
+            Debug.Log("You won!");
+            SceneManager.LoadScene("VictoryScene");
+
+            // Show victory message (optional)
+            Debug.Log("Victory! All tasks completed on time.");
+        }
+
+        void LoseGame()
+        {
+            // Load FailureScene
+            Debug.Log("You lost!");
+            SceneManager.LoadScene("FailureScene");
+
+            // Unlock the cursor
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
+
+            // Show failure message (optional)
+            Debug.Log("Failure! Time's up and not all tasks are completed.");
+        }
+
+        bool AreAllTasksCompleted()
+        {
+            foreach (bool task in taskCompleted)
+            {
+                if (!task) return false; // If any task is not complete, return false
+            }
+            return true; // All tasks are completed
+        }
+
+        public void TaskCompleted(int taskIndex)
+        {
+            if (taskIndex >= 0 && taskIndex < tasks.Length)
+            {
+                taskCompleted[taskIndex] = true;
+                // You can also change the task color to green here if needed
+            }
         }
 
         private void OnTriggerEnter(Collider other)
         {
-            if (other.CompareTag("Player")) // Check if the collider is the player
+            if (other.CompareTag("Player"))
             {
                 playerInRange = true;
                 if (!gameStarted)
                 {
-                    interactionUI.SetActive(true); // Show "Press E to Start Tasks"
-                    interactionText.text = $"Press E to Start Game ({npcName})";
+                    interactionUI.SetActive(true);
+                    interactionText.text = $"Press E to Start Game {npcName}";
                 }
             }
         }
@@ -196,7 +220,7 @@ namespace Unity.FantasyKingdom
             if (other.CompareTag("Player"))
             {
                 playerInRange = false;
-                interactionUI.SetActive(false); // Hide "Press E to Start Tasks"
+                interactionUI.SetActive(false);
             }
         }
     }
