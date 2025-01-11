@@ -7,6 +7,7 @@ namespace Unity.FantasyKingdom
         public GameObject[] objectsToDeactivateInVR; // Assign the objects to deactivate in VR 
         public GameObject[] accessBarriers; // Assign the objects to deactivate in VR mode
         public GameObject label; // Assign the objects to deactivate in VR mode
+        public GameObject compass;
 
 
         public Transform player; // Reference to the player's transform
@@ -24,6 +25,7 @@ namespace Unity.FantasyKingdom
             if (selectedMode == "Virtual Reality")
             {
                 label.SetActive(true);
+                compass.SetActive(false);
                 // Deactivate objects
                 foreach (var obj in objectsToDeactivateInVR)
                 {

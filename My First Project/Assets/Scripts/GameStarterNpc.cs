@@ -34,6 +34,8 @@ namespace Unity.FantasyKingdom
 
         public GameObject[] accessBarriers; 
 
+        public GameObject compass;
+
         private Coroutine taskTimerCoroutine; // Reference for the timer coroutine
 
         [Header("Music Settings")]
@@ -80,6 +82,8 @@ namespace Unity.FantasyKingdom
 
             // Activate game objects
             potato.SetActive(true);
+            compass.SetActive(true);
+
             invisibleWall.SetActive(false);
             invisibleWall2.SetActive(false);
             foreach (GameObject parrot in parrots) parrot.SetActive(true);

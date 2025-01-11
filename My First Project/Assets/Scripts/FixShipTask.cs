@@ -13,6 +13,9 @@ namespace Unity.FantasyKingdom
 
         public GameStarterNPC gameStarterNPC; // Reference to the GameStarterNPC script
 
+        public GameObject taskPointer;
+
+
 
 
         private FixPoint[] fixPoints;        // Array of fix points
@@ -73,6 +76,8 @@ namespace Unity.FantasyKingdom
             {
                 string completedTask = $"<color=green>{taskDescription}</color>";
                 taskListText.text = taskListText.text.Replace(taskDescription, completedTask);
+                taskPointer.SetActive(false);
+
                 gameStarterNPC.TaskCompleted(3); // Assuming this is the first task in the list
 
             }

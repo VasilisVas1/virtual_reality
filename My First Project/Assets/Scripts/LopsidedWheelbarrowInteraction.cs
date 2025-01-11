@@ -15,6 +15,9 @@ namespace Unity.FantasyKingdom
 
         public GameStarterNPC gameStarterNPC; // Reference to the GameStarterNPC script
 
+        public GameObject taskPointer;
+
+
 
         private void Start()
         {
@@ -39,6 +42,8 @@ namespace Unity.FantasyKingdom
             // Update the task in the UI (turn it green)
             string completedTask = $"<color=green>{taskDescription}</color>";
             taskListText.text = taskListText.text.Replace(taskDescription, completedTask);
+            taskPointer.SetActive(false);
+
             gameStarterNPC.TaskCompleted(4); // Assuming this is the first task in the list
 
 
