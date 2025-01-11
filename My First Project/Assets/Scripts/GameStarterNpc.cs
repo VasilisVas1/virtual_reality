@@ -103,7 +103,7 @@ namespace Unity.FantasyKingdom
 
             // Display task list
             taskListText.gameObject.SetActive(true);
-            taskListText.text = "Tasks:\n";
+            taskListText.text = "Tasks:(Press T to close)\n";
             for (int i = 0; i < tasks.Length; i++)
             {
                 taskListText.text += $"- {tasks[i]}\n";

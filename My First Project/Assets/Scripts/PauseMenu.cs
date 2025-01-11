@@ -1,5 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
+
 
 public class PauseMenu : MonoBehaviour
 {
@@ -16,6 +18,9 @@ public class PauseMenu : MonoBehaviour
     public Camera playerCamera; // Reference to the player's camera
     public Camera boatCamera;   // Reference to the boat's camera
     public GameObject player;   // Reference to the player GameObject
+
+    public HelpMenu helpMenu; // Reference to the HelpMenu script
+
     private bool isPaused = false;
     private bool isInSettings = false;
     private bool wasOnBoat = false; // Track if the player was on the boat when pausing
@@ -33,6 +38,10 @@ public class PauseMenu : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Escape))
         {
+
+            // Prevent opening Pause Menu if Help Menu is active
+            if (helpMenu != null && helpMenu.IsHelpMenuActive()) return;
+
             if (isInSettings)
             {
                 CloseSettings(); // Close settings if open
@@ -78,6 +87,12 @@ public class PauseMenu : MonoBehaviour
         Cursor.visible = true;
         isPaused = true;
     }
+
+    public bool IsPauseMenuActive()
+    {
+        return isPaused;
+    }
+
 
     public void Resume()
     {

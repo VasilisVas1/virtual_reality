@@ -1,29 +1,59 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using TMPro;
 
 namespace Unity.FantasyKingdom
 {
     public class MainMenu : MonoBehaviour
     {
-        // References to the main menu panel and settings panel
         public GameObject mainMenuPanel;
         public GameObject settingsPanel;
 
-        // Called when the player clicks "Start Game"
-        public void StartGame()
+        // Variable to store the current mode ("Virtual Reality" or "Game Mode")
+        private string currentMode = "Game Mode";
+
+        // Reference to the mode selection button's text
+        public TMP_Text modeButtonText;
+
+        private void Start()
         {
-            SceneManager.LoadScene("SampleScene"); // Replace "SampleScene" with your actual game scene name
+            // Set the default mode if needed
+            currentMode = "Game Mode";
+            UpdateModeButtonText();
         }
 
-        // Called when the player clicks "Settings"
+        public void ToggleMode()
+        {
+            // Toggle between "Virtual Reality" and "Game Mode"
+            if (currentMode == "Game Mode")
+                currentMode = "Virtual Reality";
+            else
+                currentMode = "Game Mode";
+
+            UpdateModeButtonText();
+        }
+
+        private void UpdateModeButtonText()
+        {
+            // Update the button text based on the current mode
+            modeButtonText.text = currentMode;
+        }
+
+        public void StartGame()
+        {
+            // Store the selected mode so it can be accessed in the next scene
+            PlayerPrefs.SetString("SelectedMode", currentMode);
+            PlayerPrefs.Save();
+
+            SceneManager.LoadScene("SampleScene");
+        }
+
         public void OpenSettings()
         {
-            // Hide the main menu and show the settings panel
             mainMenuPanel.SetActive(false);
             settingsPanel.SetActive(true);
         }
 
-        // Called when the player clicks "Quit Game"
         public void QuitGame()
         {
             Debug.Log("Quitting the game...");
