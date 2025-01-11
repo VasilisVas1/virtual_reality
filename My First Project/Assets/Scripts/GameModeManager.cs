@@ -4,7 +4,11 @@ namespace Unity.FantasyKingdom
 {
     public class GameModeManager : MonoBehaviour
     {
-        public GameObject[] objectsToDeactivateInVR; // Assign the objects to deactivate in VR mode
+        public GameObject[] objectsToDeactivateInVR; // Assign the objects to deactivate in VR 
+        public GameObject[] accessBarriers; // Assign the objects to deactivate in VR mode
+        public GameObject label; // Assign the objects to deactivate in VR mode
+
+
         public Transform player; // Reference to the player's transform
         public ActivationOfGameStarterNpc scriptToDisableInVR; // Reference to the specific script to disable in VR mode
 
@@ -12,9 +16,14 @@ namespace Unity.FantasyKingdom
         {
             // Retrieve the selected mode
             string selectedMode = PlayerPrefs.GetString("SelectedMode", "Game Mode");
+            foreach (var obj2 in accessBarriers)
+            {
+                obj2.SetActive(true);
+            }
 
             if (selectedMode == "Virtual Reality")
             {
+                label.SetActive(true);
                 // Deactivate objects
                 foreach (var obj in objectsToDeactivateInVR)
                 {
@@ -30,6 +39,8 @@ namespace Unity.FantasyKingdom
             }
             else if (selectedMode == "Game Mode")
             {
+                label.SetActive(false);
+
                 // Set player position for Game Mode
                 player.position = new Vector3(640.748047f, 0.982560635f, 294.887085f); // Adjust to your Game Mode starting position
 

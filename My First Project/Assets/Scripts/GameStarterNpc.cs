@@ -32,6 +32,8 @@ namespace Unity.FantasyKingdom
         public GameObject[] fishes;         // Array of fish GameObjects to be activated
         public GameObject[] lopsidedWheelbarrows; // Array of lopsided wheelbarrow GameObjects to be activated
 
+        public GameObject[] accessBarriers; 
+
         private Coroutine taskTimerCoroutine; // Reference for the timer coroutine
 
         [Header("Music Settings")]
@@ -51,6 +53,7 @@ namespace Unity.FantasyKingdom
             foreach (GameObject parrot in parrots) parrot.SetActive(false);
             foreach (GameObject fish in fishes) fish.SetActive(false);
             foreach (GameObject wheelbarrow in lopsidedWheelbarrows) wheelbarrow.SetActive(false);
+
 
             // Initialize task completion array
             taskCompleted = new bool[tasks.Length];
@@ -81,15 +84,20 @@ namespace Unity.FantasyKingdom
             invisibleWall2.SetActive(false);
             foreach (GameObject parrot in parrots) parrot.SetActive(true);
             foreach (GameObject fish in fishes)
-{
-    fish.SetActive(true); // Reactivate the fish
-    var audioSource = fish.GetComponent<AudioSource>();
-    if (audioSource != null)
-    {
-        audioSource.Stop(); // Ensure a fresh start
-        audioSource.Play(); // Start playback again
-    }
-}            foreach (GameObject wheelbarrow in lopsidedWheelbarrows) wheelbarrow.SetActive(true);
+            {
+                fish.SetActive(true); // Reactivate the fish
+                var audioSource = fish.GetComponent<AudioSource>();
+                if (audioSource != null)
+                {
+                    audioSource.Stop(); // Ensure a fresh start
+                    audioSource.Play(); // Start playback again
+                }
+            }        
+
+
+            foreach (GameObject wheelbarrow in lopsidedWheelbarrows) wheelbarrow.SetActive(true);
+            foreach (GameObject accessBarrier in accessBarriers) accessBarrier.SetActive(false);
+
 
             // Play background music
             if (backgroundAudioSource != null && newBackgroundMusic != null)
