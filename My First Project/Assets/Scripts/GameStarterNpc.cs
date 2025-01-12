@@ -38,6 +38,9 @@ namespace Unity.FantasyKingdom
 
         private Coroutine taskTimerCoroutine; // Reference for the timer coroutine
 
+        public ExplosiveMovement scriptToDisableInVR2;
+
+
         [Header("Music Settings")]
         public AudioSource backgroundAudioSource; // The AudioSource component
         public AudioClip newBackgroundMusic;      // The new music to play
@@ -83,6 +86,10 @@ namespace Unity.FantasyKingdom
             // Activate game objects
             potato.SetActive(true);
             compass.SetActive(true);
+
+            // Deactivate the specific script
+            if (scriptToDisableInVR2 != null)
+                scriptToDisableInVR2.enabled = true;
 
             invisibleWall.SetActive(false);
             invisibleWall2.SetActive(false);

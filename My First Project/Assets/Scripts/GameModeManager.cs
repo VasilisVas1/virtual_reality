@@ -12,6 +12,7 @@ namespace Unity.FantasyKingdom
 
         public Transform player; // Reference to the player's transform
         public ActivationOfGameStarterNpc scriptToDisableInVR; // Reference to the specific script to disable in VR mode
+        public ExplosiveMovement scriptToDisableInVR2;
 
         private void Start()
         {
@@ -21,6 +22,10 @@ namespace Unity.FantasyKingdom
             {
                 obj2.SetActive(true);
             }
+
+            // Deactivate the specific script
+            if (scriptToDisableInVR2 != null)
+                scriptToDisableInVR2.enabled = false;
 
             if (selectedMode == "Virtual Reality")
             {
