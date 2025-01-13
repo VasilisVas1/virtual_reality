@@ -91,15 +91,19 @@ void Explode(GameObject explosive)
 
 
 
-    // Optional: Add a visual counter to show remaining uses
     void OnGUI()
 {
     // Create a GUIStyle to modify font size
     GUIStyle guiStyle = new GUIStyle(GUI.skin.label);
     guiStyle.fontSize = 24; // Set the font size to a larger value
-    
-    // Position the label in the top-right corner of the screen
-    GUI.Label(new Rect(Screen.width - 1080, 490, 200, 100), "Explosives Remaining(Press G to use): " + remainingUses, guiStyle);
+
+    // Calculate position relative to the bottom-left corner
+    float xPosition = 20f; // Margin from the left edge
+    float yPosition = Screen.height - 50f; // Margin from the bottom edge
+
+    // Position the label dynamically based on screen size
+    GUI.Label(new Rect(xPosition, yPosition, 600, 30), "Explosives Remaining (Press G to use): " + remainingUses, guiStyle);
 }
+
 
 }

@@ -25,6 +25,8 @@ public class PauseMenu : MonoBehaviour
     private bool isInSettings = false;
     private bool wasOnBoat = false; // Track if the player was on the boat when pausing
 
+
+
     void Start()
     {
         // Ensure default volumes are set
@@ -32,6 +34,20 @@ public class PauseMenu : MonoBehaviour
 
         //musicAudioSource.volume = 0.5f;
         musicVolumeSlider.value = musicAudioSource.volume;
+
+         // Ensure the game starts in an unpaused state
+    Time.timeScale = 1f; // Set time scale to normal
+    isPaused = false;    // Reset pause state
+
+    // Lock the cursor and hide it at the start of the scene
+    Cursor.lockState = CursorLockMode.Locked;
+    Cursor.visible = false;
+
+    // Enable player controller
+    if (playerController != null)
+    {
+        playerController.enabled = true;
+    }
     }
 
     void Update()
@@ -167,11 +183,15 @@ public class PauseMenu : MonoBehaviour
 
     public void QuitGame()
     {
+        SceneManager.LoadScene("MainMenu");
+
+        /*
         Debug.Log("Quitting game...");
 #if UNITY_EDITOR
         UnityEditor.EditorApplication.isPlaying = false;
 #else
         Application.Quit();
 #endif
+*/
     }
 }
