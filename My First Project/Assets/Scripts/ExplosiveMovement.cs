@@ -99,7 +99,7 @@ void Explode(GameObject explosive)
     guiStyle.fontSize = 24; // Set the font size to a larger value
     
     // Position the label in the top-right corner of the screen
-    GUI.Label(new Rect(Screen.width - 199, 120, 200, 100), "Explosives Remaining(Press G to use): " + remainingUses, guiStyle);
+    GUI.Label(new Rect(Screen.width - 1080, 490, 200, 100), "Explosives Remaining(Press G to use): " + remainingUses, guiStyle);
 }
 
 }
