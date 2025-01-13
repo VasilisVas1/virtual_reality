@@ -6,6 +6,7 @@ namespace Unity.FantasyKingdom
     {
         public GameObject[] objectsToDeactivateInVR; // Assign the objects to deactivate in VR 
         public GameObject[] accessBarriers; // Assign the objects to deactivate in VR mode
+
         public GameObject label; // Assign the objects to deactivate in VR mode
         public GameObject compass;
 
@@ -13,6 +14,7 @@ namespace Unity.FantasyKingdom
         public Transform player; // Reference to the player's transform
         public ActivationOfGameStarterNpc scriptToDisableInVR; // Reference to the specific script to disable in VR mode
         public ExplosiveMovement scriptToDisableInVR2;
+        public RotatingRing[] scriptToDisableInGM;
 
         private void Start()
         {
@@ -46,6 +48,13 @@ namespace Unity.FantasyKingdom
             }
             else if (selectedMode == "Game Mode")
             {
+
+                foreach(var script in scriptToDisableInGM){
+                    if (script != null)
+                        script.enabled = false;
+                }
+
+
                 label.SetActive(false);
 
                 // Set player position for Game Mode
