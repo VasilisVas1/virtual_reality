@@ -7,7 +7,6 @@ public class RotatingRing : MonoBehaviour
     public class RingSettings
     {
         public Transform ringObject; // The ring to rotate, scale, and float
-        public float rotationSpeed = 50f; // Speed of rotation
         public float scalingAmplitude = 0.2f; // Scaling variation (max change in size)
         public float scalingSpeed = 2f; // Speed of the scaling effect
         public float floatAmplitude = 0.2f; // Max upward movement from the base
@@ -60,10 +59,6 @@ public class RotatingRing : MonoBehaviour
                 ring.ringObject.gameObject.SetActive(true);
                 isActive[ring] = true;
             }
-
-            // Rotate the ring
-            ring.ringObject.Rotate(Vector3.up, ring.rotationSpeed * Time.deltaTime);
-
             // Apply scaling effect
             float scale = Mathf.PingPong(Time.time * ring.scalingSpeed, ring.scalingAmplitude) + 1f;
             ring.ringObject.localScale = initialScales[ring] * scale;

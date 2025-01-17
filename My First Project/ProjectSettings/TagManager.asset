@@ -19,6 +19,7 @@ TagManager:
   - BellZone
   - Water
   - Parrot
+  - Destroyable
   layers:
   - Default
   - TransparentFX
