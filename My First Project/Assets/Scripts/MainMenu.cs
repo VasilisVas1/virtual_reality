@@ -20,6 +20,10 @@ namespace Unity.FantasyKingdom
             // Set the default mode if needed
             currentMode = "Game Mode";
             UpdateModeButtonText();
+
+            
+            Time.timeScale = 1f;
+
         }
 
         public void ToggleMode()
