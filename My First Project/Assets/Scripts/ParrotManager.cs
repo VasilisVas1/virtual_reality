@@ -4,23 +4,24 @@ namespace Unity.FantasyKingdom
 {
     public class ParrotManager : MonoBehaviour
     {
-        public GameObject personalityParrot; // The fixed Personality Parrot
-        public Transform[] startPositions;   // Possible starting positions
+        public GameObject personalityParrot; // Το σταθερό παπαγαλάκι προσωπικότητας
+        public Transform[] startPositions;   // Πιθανές αρχικές θέσεις
 
         private void Awake()
         {
-            AssignPersonalityParrotPosition();
+            AssignPersonalityParrotPosition();// Καλεί τη μέθοδο για την τοποθέτηση του παπαγάλου σε μια αρχική θέση
         }
 
         private void AssignPersonalityParrotPosition()
         {
+            // Έλεγχος αν ο παπαγάλος ή οι θέσεις δεν έχουν οριστεί σωστά
             if (personalityParrot == null || startPositions.Length < 3)
             {
                 Debug.LogError("Please assign the Personality Parrot and at least 3 start positions in the ParrotManager!");
                 return;
             }
 
-            // Randomly choose a starting position for the Personality Parrot
+            // Επιλογή μιας τυχαίας αρχικής θέσης για τον Παπαγάλο Προσωπικότητας
             int randomPositionIndex = Random.Range(0, startPositions.Length);
             personalityParrot.transform.position = startPositions[randomPositionIndex].position;
 

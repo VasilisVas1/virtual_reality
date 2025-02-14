@@ -5,20 +5,19 @@ namespace Unity.FantasyKingdom
 {
     public class CatchJerryTask : MonoBehaviour
     {
-        public TMP_Text taskListText;        // Reference to the task list UI text
-        public string taskDescription = "Catch Jerry the Goblin"; // Task description
-        public GameObject interactionUI;    // UI element to display the interaction message
-        public GameObject jerryGameObject;  // Reference to Jerry's GameObject
+        public TMP_Text taskListText;        
+        public string taskDescription = "Catch Jerry the Goblin"; 
+        public GameObject interactionUI;    
+        public GameObject jerryGameObject;  
 
-        private bool playerInRange = false; // Tracks if the player is in range of Jerry
-        private bool taskCompleted = false; // Tracks if the task is completed
+        private bool playerInRange = false; 
+        private bool taskCompleted = false; 
 
-        public GameStarterNPC gameStarterNPC; // Reference to the GameStarterNPC script
+        public GameStarterNPC gameStarterNPC; 
 
 
         private void Update()
         {
-            // Check if the player presses E while in range and the task is not completed
             if (playerInRange && Input.GetKeyDown(KeyCode.E) && !taskCompleted)
             {
                 CatchJerry();
@@ -29,29 +28,25 @@ namespace Unity.FantasyKingdom
         {
             taskCompleted = true;
 
-            // Update the task in the UI
             if (taskListText != null)
             {
                 string completedTask = $"<color=green>{taskDescription}</color>";
                 taskListText.text = taskListText.text.Replace(taskDescription, completedTask);
 
-                gameStarterNPC.TaskCompleted(5); // Assuming this is the first task in the list
+                gameStarterNPC.TaskCompleted(5);
 
             }
 
-            // Hide the interaction UI
             if (interactionUI != null)
             {
                 interactionUI.SetActive(false);
             }
 
-            // Make Jerry disappear
             if (jerryGameObject != null)
             {
                 jerryGameObject.SetActive(false);
             }
 
-            // Perform any additional actions for catching Jerry (e.g., animations, sound effects, etc.)
             Debug.Log("Jerry has been caught!");
         }
 

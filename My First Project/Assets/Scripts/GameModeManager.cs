@@ -4,64 +4,67 @@ namespace Unity.FantasyKingdom
 {
     public class GameModeManager : MonoBehaviour
     {
-        public GameObject[] objectsToDeactivateInVR; // Assign the objects to deactivate in VR 
-        public GameObject[] accessBarriers; // Assign the objects to deactivate in VR mode
+        public GameObject[] objectsToDeactivateInVR; // Αντικείμενα που πρέπει να απενεργοποιηθούν στη λειτουργία VR
+        public GameObject[] accessBarriers; // Αντικείμενα που πρέπει να ενεργοποιηθούν στη λειτουργία VR
 
-        public GameObject label; // Assign the objects to deactivate in VR mode
-        public GameObject compass;
+        public GameObject label; // Ετικέτα που εμφανίζεται στη λειτουργία VR
+        public GameObject compass; // Πυξίδα που χρησιμοποιείται στη λειτουργία Game Mode
 
-
-        public Transform player; // Reference to the player's transform
-        public ActivationOfGameStarterNpc scriptToDisableInVR; // Reference to the specific script to disable in VR mode
-        public ExplosiveMovement scriptToDisableInVR2;
-        public RotatingRing[] scriptToDisableInGM;
+        public Transform player; // Αναφορά στη μετασχηματισμένη θέση του παίκτη
+        public ActivationOfGameStarterNpc scriptToDisableInVR; // Αναφορά στο script που πρέπει να απενεργοποιηθεί στη λειτουργία VR
+        public ExplosiveMovement scriptToDisableInVR2; // Δεύτερο script προς απενεργοποίηση στη λειτουργία VR
+        public RotatingRing[] scriptToDisableInGM; // Πίνακας scripts που πρέπει να απενεργοποιηθούν στη λειτουργία Game Mode
 
         private void Start()
         {
-            // Retrieve the selected mode
+            // Ανάκτηση της επιλεγμένης λειτουργίας από τις ρυθμίσεις του χρήστη
             string selectedMode = PlayerPrefs.GetString("SelectedMode", "Game Mode");
+            
+            // Ενεργοποίηση των φραγμών πρόσβασης
             foreach (var obj2 in accessBarriers)
             {
                 obj2.SetActive(true);
             }
 
-            // Deactivate the specific script
+            // Απενεργοποίηση συγκεκριμένου script
             if (scriptToDisableInVR2 != null)
                 scriptToDisableInVR2.enabled = false;
 
+            // Έλεγχος αν η επιλεγμένη λειτουργία είναι "Virtual Reality"
             if (selectedMode == "Virtual Reality")
             {
-                label.SetActive(true);
-                compass.SetActive(false);
-                // Deactivate objects
+                label.SetActive(true); // Εμφάνιση της ετικέτας
+                compass.SetActive(false); // Απόκρυψη της πυξίδας
+                
+                // Απενεργοποίηση αντικειμένων για VR
                 foreach (var obj in objectsToDeactivateInVR)
                 {
                     obj.SetActive(false);
                 }
 
-                // Deactivate the specific script
+                // Απενεργοποίηση συγκεκριμένου script
                 if (scriptToDisableInVR != null)
                     scriptToDisableInVR.enabled = false;
 
-                // Set player position for VR mode
-                player.position = new Vector3(757.615662f, 0.999999225f, 547.593079f); // Adjust to your VR starting position
+                // Τοποθέτηση του παίκτη στη σωστή θέση για VR
+                player.position = new Vector3(757.615662f, 0.999999225f, 547.593079f); // Προσαρμογή στην αρχική θέση VR
             }
             else if (selectedMode == "Game Mode")
             {
-
-                foreach(var script in scriptToDisableInGM){
+                // Απενεργοποίηση των scripts για Game Mode
+                foreach (var script in scriptToDisableInGM)
+                {
                     if (script != null)
                         script.enabled = false;
                 }
 
+                label.SetActive(false); // Απόκρυψη της ετικέτας
 
-                label.SetActive(false);
+                // Τοποθέτηση του παίκτη στη σωστή θέση για Game Mode
+                player.position = new Vector3(640.748047f, 0.982560635f, 294.887085f); // Προσαρμογή στην αρχική θέση του Game Mode
 
-                // Set player position for Game Mode
-                player.position = new Vector3(640.748047f, 0.982560635f, 294.887085f); // Adjust to your Game Mode starting position
-
-                // Set player rotation for Game Mode
-                player.rotation = Quaternion.Euler(0f, 145f, 0f); // Adjust to your desired rotation (example: facing 90 degrees on the Y axis)
+                // Περιστροφή του παίκτη ώστε να βλέπει προς συγκεκριμένη κατεύθυνση
+                player.rotation = Quaternion.Euler(0f, 145f, 0f); // Περιστροφή κατά 145 μοίρες στον άξονα Y
             }
         }
     }
